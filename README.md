@@ -1,10 +1,3 @@
-## MeowChat AI, by Srcbook
+## MeowChat AI, by 喵哥
 
-This app was created using https://srcbook.com.
-Need help or want to join the community? Join our [Discord](https://discord.gg/shDEGBSe2d).
-
-To run the devserver:
-```
-npm install
-npm run dev
-```
+喵哥AI 一个基于马斯克的X.AI 的API 模型调用的人工智能助手
