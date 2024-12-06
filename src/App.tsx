@@ -7,12 +7,19 @@ import { Cat, Settings, Trash2 } from 'lucide-react';
 import { SettingsModal } from './components/SettingsModal';
 
 const DEFAULT_API_KEY = 'xai-PDby5aZny9HP02180FkgVPqMMSRVfIABmelIC8qj4Sx6krKynxEX0DYLEaXV6l5URSEZgmfd3fNfjrwU';
+const STORAGE_KEYS = {
+  MESSAGES: 'chat_messages',
+  API_KEY: 'xai_api_key'
+};
 
 function App() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const savedMessages = localStorage.getItem(STORAGE_KEYS.MESSAGES);
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('xai_api_key') || DEFAULT_API_KEY);
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEYS.API_KEY) || DEFAULT_API_KEY);
   const [selectedModel, setSelectedModel] = useState('grok-beta');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -24,14 +31,20 @@ function App() {
     scrollToBottom();
   }, [messages]);
 
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
+  }, [messages]);
+
   const clearChat = () => {
     setMessages([]);
+    localStorage.removeItem(STORAGE_KEYS.MESSAGES);
   };
 
   const handleSaveSettings = (newApiKey: string, newModel: string) => {
     setApiKey(newApiKey);
     setSelectedModel(newModel);
-    localStorage.setItem('xai_api_key', newApiKey);
+    localStorage.setItem(STORAGE_KEYS.API_KEY, newApiKey);
   };
 
   const currentModel = AVAILABLE_MODELS.find(m => m.id === selectedModel);
@@ -132,18 +145,20 @@ function App() {
       <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
         <div className="bg-white rounded-2xl shadow-sm p-4 flex flex-col h-[600px]">
           <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-            <div className="text-center py-4">
-              <h2 className="text-xl font-medium text-gray-700 mb-2">
-                哈喽，很高兴认识你！
-              </h2>
-              <p className="text-gray-600">
-                我叫喵哥，一个集成了x.ai模型的人工智能对话助手，快来和我聊天吧！
-              </p>
-              <p className="text-gray-500 text-sm mt-2">
-                当前使用模型: {currentModel?.name}
-                {currentModel?.supportsImages && ' (支持图片分析)'}
-              </p>
-            </div>
+            {messages.length === 0 && (
+              <div className="text-center py-4">
+                <h2 className="text-xl font-medium text-gray-700 mb-2">
+                  哈喽，很高兴认识你！
+                </h2>
+                <p className="text-gray-600">
+                  我叫喵哥，一个集成了x.ai模型的人工智能对话助手，快来和我聊天吧！
+                </p>
+                <p className="text-gray-500 text-sm mt-2">
+                  当前使用模型: {currentModel?.name}
+                  {currentModel?.supportsImages && ' (支持图片分析)'}
+                </p>
+              </div>
+            )}
             {messages.map((message, index) => (
               <ChatMessage key={index} message={message} />
             ))}
