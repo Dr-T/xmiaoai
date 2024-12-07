@@ -15,6 +15,7 @@ export interface ModelOption {
   name: string;
   description: string;
   supportsImages?: boolean;
+  isImageGenerator?: boolean;
 }
 
 export const AVAILABLE_MODELS: ModelOption[] = [
@@ -24,9 +25,9 @@ export const AVAILABLE_MODELS: ModelOption[] = [
     description: 'x.ai 官方对话模型'
   },
   {
-    id: 'grok-vision-beta',
-    name: 'Grok Vision Beta',
-    description: 'x.ai 官方多模态对话模型，支持图片分析',
-    supportsImages: true
+    id: 'flux-1',
+    name: 'FLUX.1',
+    description: 'Hugging Face图像生成模型',
+    isImageGenerator: true
   }
 ];

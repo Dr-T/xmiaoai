@@ -1,5 +1,5 @@
 {
-  "name": "miaogeAI",
+  "name": "My new app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,7 +14,8 @@
     "eventsource-parser": "^3.0.0",
     "lucide-react": "^0.453.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.0.2"
   },
   "devDependencies": {
     "@types/react": "^18.3.6",
