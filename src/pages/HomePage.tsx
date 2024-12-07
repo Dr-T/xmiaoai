@@ -12,7 +12,7 @@ export function HomePage() {
               Free Image to Prompt AI
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              通过人工智能，轻松将图片转换为详细的提示词描述。快速、准确、免费。
+              通过我们的人工智能，轻松将中文描述转换为英文提示词，并生成你想要的图片。快速、准确、免费。
             </p>
             <div className="flex gap-4 justify-center">
               <Link
@@ -47,10 +47,10 @@ export function HomePage() {
                 <ImageIcon className="w-6 h-6 text-amber-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                智能识别
+                快速，且稳定的
               </h3>
               <p className="text-gray-600">
-                准确识别图片中的物体、场景、风格等元素，生成精准的描述。
+                准确识别文字描述，生成精准的英文提示词。
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -61,7 +61,7 @@ export function HomePage() {
                 快速处理
               </h3>
               <p className="text-gray-600">
-                采用先进的AI模型，秒级完成图片分析和提示词生成。
+                采用先进的AI模型，秒级完成图片生成和提示词生成。
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm">
@@ -72,7 +72,7 @@ export function HomePage() {
                 简单易用
               </h3>
               <p className="text-gray-600">
-                友好的用户界面，支持拖拽上传，一键生成提示词。
+                友好的用户界面，支持中文描述，一键生成英文提示词。
               </p>
             </div>
           </div>
@@ -83,10 +83,10 @@ export function HomePage() {
       <section className="bg-amber-50 py-20">
         <div className="container mx-auto px-4 max-w-5xl text-center">
           <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            开始体验智能图片分析
+            开始体验喵哥文字生成图片
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            立即使用我们的AI助手，让图片描述变得简单而准确。
+            立即使用我们的AI助手，让绘画变得简单而准确。
           </p>
           <Link
             to="/chat"
