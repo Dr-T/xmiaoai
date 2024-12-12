@@ -4,12 +4,18 @@ import { ChatMessage } from '../components/ChatMessage';
 import { ChatInput } from '../components/ChatInput';
 import { Cat, Settings, Trash2 } from 'lucide-react';
 import { SettingsModal } from '../components/SettingsModal';
+import { HfInference } from '@huggingface/inference';
 
 const DEFAULT_API_KEY = 'xai-PDby5aZny9HP02180FkgVPqMMSRVfIABmelIC8qj4Sx6krKynxEX0DYLEaXV6l5URSEZgmfd3fNfjrwU';
+const DEFAULT_GEMINI_KEY = 'AIzaSyAT1bpBjZvUzH1TU2hlylZnBYLN-9cMoig';
+
 const STORAGE_KEYS = {
   MESSAGES: 'chat_messages',
-  API_KEY: 'xai_api_key'
+  API_KEY: 'xai_api_key',
+  GEMINI_KEY: 'gemini_api_key'
 };
+
+const hf = new HfInference("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");
 
 async function queryFluxApi(prompt: string) {
   const response = await fetch(
@@ -44,7 +50,9 @@ export function ChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem(STORAGE_KEYS.API_KEY) || DEFAULT_API_KEY);
+  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem(STORAGE_KEYS.GEMINI_KEY) || DEFAULT_GEMINI_KEY);
   const [selectedModel, setSelectedModel] = useState('grok-beta');
+  const [streamingResponse, setStreamingResponse] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -53,7 +61,7 @@ export function ChatPage() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, streamingResponse]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.MESSAGES, JSON.stringify(messages));
@@ -64,10 +72,12 @@ export function ChatPage() {
     localStorage.removeItem(STORAGE_KEYS.MESSAGES);
   };
 
-  const handleSaveSettings = (newApiKey: string, newModel: string) => {
+  const handleSaveSettings = (newApiKey: string, newModel: string, newGeminiKey: string) => {
     setApiKey(newApiKey);
+    setGeminiKey(newGeminiKey);
     setSelectedModel(newModel);
     localStorage.setItem(STORAGE_KEYS.API_KEY, newApiKey);
+    localStorage.setItem(STORAGE_KEYS.GEMINI_KEY, newGeminiKey);
   };
 
   const currentModel = AVAILABLE_MODELS.find(m => m.id === selectedModel);
@@ -80,10 +90,10 @@ export function ChatPage() {
     };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+    setStreamingResponse('');
 
     try {
       if (selectedModel === 'flux-1') {
-        // Handle FLUX.1 image generation
         const generatedImageBase64 = await queryFluxApi(content);
         const assistantMessage: Message = {
           role: 'assistant',
@@ -91,8 +101,51 @@ export function ChatPage() {
           image: generatedImageBase64
         };
         setMessages((prev) => [...prev, assistantMessage]);
+      } else if (selectedModel === 'gemini-flash') {
+        if (!geminiKey) {
+          throw new Error('请先在设置中配置Gemini API密钥');
+        }
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: content
+                  }
+                ]
+              }
+            ],
+            generationConfig: {
+              temperature: 1,
+              topK: 40,
+              topP: 0.95,
+              maxOutputTokens: 8192,
+              responseMimeType: "text/plain"
+            }
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error('API请求失败，请检查你的Gemini API密钥是否正确');
+        }
+
+        const data = await response.json();
+        const generatedText = data.candidates[0].content.parts[0].text;
+        
+        const assistantMessage: Message = {
+          role: 'assistant',
+          content: generatedText
+        };
+        
+        setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        // Handle x.ai chat
         if (!apiKey) {
           throw new Error('请先在设置中配置你的 x.ai API密钥才能开始对话哦！');
         }
@@ -107,7 +160,7 @@ export function ChatPage() {
             messages: [
               { 
                 role: 'system', 
-                content: 'You are a friendly cat-themed AI assistant named MeowGPT. Respond in a helpful and playful manner.'
+                content: 'You are a friendly cat-themed AI assistant named MeowGPT. Respond in Chinese in a helpful and playful manner.'
               },
               ...messages,
               userMessage
@@ -132,17 +185,19 @@ export function ChatPage() {
       }
     } catch (error) {
       console.error('Error:', error);
+      const errorMessage = error instanceof Error ? error.message : '服务器响应出错，请稍后再试';
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: '喵呜... 遇到了一些问题。请稍后再试！'
+          content: `喵呜... ${errorMessage}`
         }
       ]);
     } finally {
       setIsLoading(false);
+      setStreamingResponse('');
     }
-  }, [messages, apiKey, selectedModel]);
+  }, [messages, apiKey, geminiKey, selectedModel]);
 
   return (
     <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
@@ -173,7 +228,7 @@ export function ChatPage() {
                 哈喽，很高兴认识你！
               </h2>
               <p className="text-gray-600">
-                我叫喵哥，一个集成了x.ai模型和FLUX.1图像生成的AI助手，快来和我聊天吧！
+                我叫喵哥，一个集成了多个AI模型的智能助手，快来和我聊天吧！
               </p>
               <p className="text-gray-500 text-sm mt-2">
                 当前使用模型: {currentModel?.name}
@@ -185,11 +240,21 @@ export function ChatPage() {
             <ChatMessage key={index} message={message} />
           ))}
           {isLoading && (
-            <div className="flex gap-2 items-center text-gray-500">
-              <Cat className="w-5 h-5 animate-bounce" />
-              <span>
-                {currentModel?.isImageGenerator ? '生成图片中...' : '思考中...'}
-              </span>
+            <div className="space-y-4">
+              {streamingResponse && (
+                <ChatMessage 
+                  message={{
+                    role: 'assistant',
+                    content: streamingResponse
+                  }}
+                />
+              )}
+              <div className="flex gap-2 items-center text-gray-500">
+                <Cat className="w-5 h-5 animate-bounce" />
+                <span>
+                  {currentModel?.isImageGenerator ? '生成图片中...' : '思考中...'}
+                </span>
+              </div>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -207,6 +272,7 @@ export function ChatPage() {
         onClose={() => setIsSettingsOpen(false)}
         onSave={handleSaveSettings}
         currentApiKey={apiKey}
+        currentSambanovaKey={geminiKey}
         currentModel={selectedModel}
       />
     </main>

@@ -1,15 +1,16 @@
 {
-  "name": "喵哥AI",
+  "name": "My new app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@huggingface/inference": "^2.8.1",
     "@types/node": "^22.10.1",
     "eventsource-parser": "^3.0.0",
     "lucide-react": "^0.453.0",

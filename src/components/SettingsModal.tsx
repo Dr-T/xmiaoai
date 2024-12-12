@@ -5,8 +5,9 @@ import { AVAILABLE_MODELS, ModelOption } from '../types/chat';
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (apiKey: string, selectedModel: string) => void;
+  onSave: (apiKey: string, selectedModel: string, geminiKey: string) => void;
   currentApiKey: string;
+  currentSambanovaKey: string;
   currentModel: string;
 }
 
@@ -15,26 +16,35 @@ export function SettingsModal({
   onClose, 
   onSave, 
   currentApiKey,
+  currentSambanovaKey: currentGeminiKey,
   currentModel
 }: SettingsModalProps) {
   const [apiKey, setApiKey] = useState(currentApiKey);
+  const [geminiKey, setGeminiKey] = useState(currentGeminiKey);
   const [selectedModel, setSelectedModel] = useState(currentModel);
   const DEFAULT_API_KEY = 'xai-PDby5aZny9HP02180FkgVPqMMSRVfIABmelIC8qj4Sx6krKynxEX0DYLEaXV6l5URSEZgmfd3fNfjrwU';
+  const DEFAULT_GEMINI_KEY = 'AIzaSyAT1bpBjZvUzH1TU2hlylZnBYLN-9cMoig';
 
   useEffect(() => {
     setApiKey(currentApiKey);
+    setGeminiKey(currentGeminiKey);
     setSelectedModel(currentModel);
-  }, [currentApiKey, currentModel]);
+  }, [currentApiKey, currentGeminiKey, currentModel]);
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     const finalApiKey = apiKey.trim() || DEFAULT_API_KEY;
-    onSave(finalApiKey, selectedModel);
+    const finalGeminiKey = geminiKey.trim() || DEFAULT_GEMINI_KEY;
+    onSave(finalApiKey, selectedModel, finalGeminiKey);
     onClose();
   };
 
-  const handleUseDefault = () => {
-    setApiKey(DEFAULT_API_KEY);
+  const handleUseDefault = (keyType: 'x.ai' | 'gemini') => {
+    if (keyType === 'x.ai') {
+      setApiKey(DEFAULT_API_KEY);
+    } else {
+      setGeminiKey(DEFAULT_GEMINI_KEY);
+    }
   };
 
   if (!isOpen) return null;
@@ -68,14 +78,34 @@ export function SettingsModal({
               />
               <button
                 type="button"
-                onClick={handleUseDefault}
+                onClick={() => handleUseDefault('x.ai')}
                 className="text-sm text-amber-600 hover:text-amber-700"
               >
                 使用默认API密钥
               </button>
-              <p className="text-sm text-gray-500">
-                如果不填写，将使用默认API密钥
-              </p>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="geminiKey" className="block text-sm font-medium text-gray-700 mb-1">
+              Gemini API密钥
+            </label>
+            <div className="space-y-2">
+              <input
+                type="password"
+                id="geminiKey"
+                value={geminiKey}
+                onChange={(e) => setGeminiKey(e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                placeholder="输入你的 Gemini API密钥"
+              />
+              <button
+                type="button"
+                onClick={() => handleUseDefault('gemini')}
+                className="text-sm text-amber-600 hover:text-amber-700"
+              >
+                使用默认API密钥
+              </button>
             </div>
           </div>
 
