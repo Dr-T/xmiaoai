@@ -2,11 +2,13 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Cat, Settings, Trash2 } from 'lucide-react';
 import { ChatPage } from './pages/ChatPage';
 import { HomePage } from './pages/HomePage';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-slate-50">
+        <Toaster position="top-center" />
         <header className="bg-white shadow-sm py-4">
           <div className="container mx-auto px-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
