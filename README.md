@@ -1,10 +1,10 @@
-MeowAI, by 喵哥
+## MeowChat AI, by Srcbook
 
-喵哥AI，一个集成了gemini ,grok-beta ，flux 的绘画，聊天助手
+This app was created using https://srcbook.com.
+Need help or want to join the community? Join our [Discord](https://discord.gg/shDEGBSe2d).
 
-你可以直接通过vercel 部署本项目
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/guioalis/xmiaoai)
-
-
-如有任何问题，请及时lssues 提出
+To run the devserver:
+```
+npm install
+npm run dev
+```

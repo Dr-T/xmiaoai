@@ -28,8 +28,9 @@ export const AVAILABLE_MODELS: ModelOption[] = [
   {
     id: 'gemini-flash',
     name: 'Gemini 2.0 Flash',
-    description: 'Google最新的超快速AI模型',
-    apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent'
+    description: 'Google最新的超快速AI模型，支持视觉识别',
+    apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
+    supportsImages: true
   },
   {
     id: 'flux-1',

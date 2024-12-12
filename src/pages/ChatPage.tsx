@@ -106,6 +106,19 @@ export function ChatPage() {
           throw new Error('请先在设置中配置Gemini API密钥');
         }
 
+        let parts: any[] = [{ text: content }];
+        
+        if (image) {
+          // Remove the data:image/jpeg;base64, prefix if it exists
+          const base64Image = image.split(',')[1] || image;
+          parts.push({
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: base64Image
+            }
+          });
+        }
+
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiKey}`, {
           method: 'POST',
           headers: {
@@ -115,11 +128,7 @@ export function ChatPage() {
             contents: [
               {
                 role: "user",
-                parts: [
-                  {
-                    text: content
-                  }
-                ]
+                parts
               }
             ],
             generationConfig: {
@@ -233,6 +242,7 @@ export function ChatPage() {
               <p className="text-gray-500 text-sm mt-2">
                 当前使用模型: {currentModel?.name}
                 {currentModel?.isImageGenerator && ' (图像生成)'}
+                {currentModel?.supportsImages && ' (支持视觉识别)'}
               </p>
             </div>
           )}
@@ -263,7 +273,7 @@ export function ChatPage() {
         <ChatInput 
           onSend={sendMessage} 
           disabled={isLoading}
-          modelSupportsImages={false}
+          modelSupportsImages={currentModel?.supportsImages || false}
         />
       </div>
 
