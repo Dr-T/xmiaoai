@@ -4,6 +4,14 @@ export interface Message {
   image?: string; // Base64 encoded image
 }
 
+export interface ChatContext {
+  id: string;
+  name: string;
+  messages: Message[];
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface ChatState {
   messages: Message[];
   isLoading: boolean;
