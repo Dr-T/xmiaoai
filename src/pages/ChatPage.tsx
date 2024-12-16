@@ -8,7 +8,7 @@ import { ChatContexts } from '../components/ChatContexts';
 import { HfInference } from '@huggingface/inference';
 
 const DEFAULT_API_KEY = 'xai-PDby5aZny9HP02180FkgVPqMMSRVfIABmelIC8qj4Sx6krKynxEX0DYLEaXV6l5URSEZgmfd3fNfjrwU';
-const DEFAULT_GEMINI_KEY = 'AIzaSyAT1bpBjZvUzH1TU2hlylZnBYLN-9cMoig';
+const DEFAULT_GEMINI_KEY = 'AIzaSyDbr2jwInlp0eyUABCdPoC3Upa54j7h_jU';
 
 const STORAGE_KEYS = {
   CONTEXTS: 'chat_contexts',
